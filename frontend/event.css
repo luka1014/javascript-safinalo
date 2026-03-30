@@ -1,0 +1,209 @@
+/* ─── Back Button ─── */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    margin-bottom: 8px;
+}
+.back-btn:hover { color: var(--primary); }
+
+/* ─── Event Hero ─── */
+.event-hero {
+    position: relative;
+    height: 420px;
+    overflow: hidden;
+    margin-top: 24px;
+}
+.event-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.event-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(8,8,15,0.95) 0%, rgba(8,8,15,0.3) 60%, transparent 100%);
+}
+.event-hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    padding-bottom: 40px;
+}
+.event-hero-content h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 400;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    line-height: 1.15;
+}
+.event-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    color: rgba(255,255,255,0.65);
+    font-size: 0.9rem;
+}
+.event-hero-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.event-hero-meta i { color: var(--primary); }
+
+/* ─── Layout ─── */
+.event-main { padding: 48px 0 80px; }
+
+.event-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    align-items: start;
+}
+
+/* ─── Left Side ─── */
+.event-section {
+    margin-bottom: 40px;
+}
+.event-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 400;
+    letter-spacing: -0.3px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+.event-section p {
+    color: var(--text-muted);
+    line-height: 1.8;
+    font-size: 0.97rem;
+    font-weight: 300;
+}
+
+/* ─── Detail Grid ─── */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+}
+.detail-item > i {
+    color: var(--primary);
+    font-size: 1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+.detail-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.detail-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+.detail-value {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+/* ─── Right Side — Reg Card ─── */
+.reg-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    position: sticky;
+    top: 100px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+}
+.reg-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+.reg-card h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+}
+
+/* ─── Capacity Bar ─── */
+.capacity-section {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+}
+.capacity-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+.capacity-bar {
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 100px;
+    overflow: hidden;
+}
+.capacity-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: var(--primary);
+    transition: width 0.6s ease;
+}
+.capacity-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+/* ─── Full State Banner ─── */
+.full-banner {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: rgba(244,63,94,0.08);
+    border: 1px solid rgba(244,63,94,0.25);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    color: var(--text-main);
+}
+.full-banner i {
+    color: var(--error);
+    font-size: 1.2rem;
+    margin-top: 2px;
+}
+.full-banner strong { display: block; margin-bottom: 4px; }
+.full-banner p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+    .event-layout { grid-template-columns: 1fr; }
+    .reg-card { position: static; }
+    .event-hero { height: 300px; }
+    .detail-grid { grid-template-columns: 1fr; }
+}

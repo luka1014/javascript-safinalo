@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventPro | Discover & Experience</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <header class="navbar">
+        <div class="container flex-between">
+            <a href="./index.html" class="logo">
+                <div class="logo-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span>Tabata Spot</span>
+            </a>
+    
+            <nav class="nav-links">
+                <a href="index.html" class="active mtavari">მთავარი</a>
+                <a href="admin.html" class="admin-btn">
+                    <span>Admin Panel</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ─── HERO ─── -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-tag">
+                <span class="pulse-dot"></span>
+                <span id="eventCount">იტვირთება...</span>
+            </div>
+            <h1>აღმოაჩინე <em>საუკეთესო</em><br>ღონისძიებები</h1>
+            <p>კონფერენციები, ვორქშოფები და შეხვედრები — ყველაფერი ერთ სივრცეში</p>
+
+            <div class="search-box">
+                <div class="search-input">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="მოძებნე ღონისძიება...">
+                </div>
+                <div class="divider"></div>
+                <select class="category-select" id="categorySelect">
+                    <option value="">ყველა კატეგორია</option>
+                    <option value="Tech">Tech</option>
+                    <option value="Design">Design</option>
+                    <option value="Business">Business</option>
+                    <option value="Art">Art</option>
+                    <option value="სხვა">სხვა</option>
+
+                </select>
+                <button class="btn-primary" onclick="loadEvents()">ძებნა</button>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat"><strong id="statTotal">—</strong><span>ღონისძიება</span></div>
+                <div class="stat-divider"></div>
+                <div class="stat"><strong id="statUpcoming">—</strong><span>მომავალი</span></div>
+                <div class="stat-divider"></div>
+                <div class="stat"><strong>98%</strong><span>კმაყოფილება</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── MAIN ─── -->
+    <main class="container">
+        <div class="section-header">
+            <div>
+                <p class="section-label">FEATURED</p>
+                <h2>აქტუალური</h2>
+            </div>
+            <div class="filter-tabs sort-tabs">
+                <button type="button" class="tab active" data-sort="">ნაგულისხმევი</button>
+                <button type="button" class="tab" data-sort="asc">თარიღი ↑</button>
+                <button type="button" class="tab" data-sort="desc">თარიღი ↓</button>
+            </div>
+            <div class="filter-tabs when-tabs" style="margin-top:10px">
+                <button type="button" class="tab when-tab active" data-when="">ყველა დრო</button>
+                <button type="button" class="tab when-tab" data-when="upcoming">მომავალი</button>
+                <button type="button" class="tab when-tab" data-when="past">წარსული</button>
+            </div>
+        </div>
+
+        <div class="grid" id="eventsGrid"></div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display:none">
+            <i class="fas fa-calendar-times"></i>
+            <h3>ღონისძიება ვერ მოიძებნა</h3>
+            <p>სცადე სხვა საძიებო სიტყვა ან კატეგორია</p>
+            <button class="btn-outline" onclick="resetSearch()">ყველა ღონისძიება</button>
+        </div>
+    </main>
+
+    <!-- ─── REGISTRATION MODAL ─── -->
+    <div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <p class="modal-label">REGISTRATION</p>
+                    <h2 id="modalEventTitle">რეგისტრაცია</h2>
+                </div>
+                <button class="close-btn" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- წარმატების ეკრანი -->
+            <div id="successState" style="display:none">
+                <div class="success-box">
+                    <div class="success-icon"><i class="fas fa-check"></i></div>
+                    <h3>წარმატებით დარეგისტრირდით!</h3>
+                    <p>შეინახეთ თქვენი დადასტურების კოდი:</p>
+                    <div class="confirmation-code" id="confirmationCode">—</div>
+                    <button class="btn-primary w-full" onclick="closeModal()" style="margin-top:20px">
+                        <span>დახურვა</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ფორმა -->
+            <form class="reg-form" id="regForm" onsubmit="handleSubmit(event)">
+
+                <div class="input-group">
+                    <label>სახელი და გვარი</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="inputName" placeholder="მაგ: გიორგი გიორგაძე" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>ელ-ფოსტა</label>
+                    <div class="input-wrap" id="emailWrap">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="inputEmail" placeholder="giorgi@email.com" required>
+                    </div>
+                    <span class="error-msg" id="errorDuplicate" style="display:none">
+                        <i class="fas fa-exclamation-circle"></i> ეს ელ-ფოსტა უკვე დარეგისტრირებულია
+                    </span>
+                </div>
+
+                <div class="input-group">
+                    <label>ტელეფონი</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="inputPhone" placeholder="+995 555 00 00 00" required>
+                    </div>
+                </div>
+
+                <!-- Capacity Full შეცდომა -->
+                <div class="error-banner" id="errorCapacity" style="display:none">
+                    <i class="fas fa-ban"></i>
+                    <span>სამწუხაროდ, ადგილები სავსეა</span>
+                </div>
+
+                <!-- ზოგადი შეცდომა -->
+                <div class="error-banner" id="errorGeneral" style="display:none">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="errorGeneralText">დაფიქსირდა შეცდომა</span>
+                </div>
+
+                <button type="submit" class="btn-primary w-full" id="submitBtn">
+                    <span>დადასტურება</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+
+            </form>
+
+            <p class="modal-footer-note">
+                რეგისტრაციით თქვენ ეთანხმებით ჩვენს <a href="#">წესებსა და პირობებს</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

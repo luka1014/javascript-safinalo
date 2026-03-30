@@ -1,0 +1,4 @@
+backend/node_modules/
+backend/events.db
+.DS_Store
+npm-debug.log*

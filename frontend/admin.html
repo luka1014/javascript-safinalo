@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventPro | Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <!-- ─── NAVBAR ─── -->
+<header class="navbar">
+    <div class="container flex-between">
+
+        <a href="./index.html" class="logo">
+            <div class="logo-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>
+                </svg>
+            </div>
+            <span>Tabata Spot</span>
+            <span class="admin-label">ADMIN</span>
+        </a>
+
+        <nav class="nav-links">
+            <a href="index.html">
+                <i class="fas fa-arrow-left"></i> მთავარი გვერდი
+            </a>
+        </nav>
+
+    </div>
+</header>
+    <!-- ─── ADMIN LAYOUT ─── -->
+    <div class="admin-layout container">
+
+        <!-- ─── SIDEBAR ─── -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <p class="sidebar-label">მენიუ</p>
+                <button class="sidebar-btn active" onclick="showTab('events')">
+                    <i class="fas fa-calendar"></i> ღონისძიებები
+                </button>
+                <button class="sidebar-btn" onclick="showTab('add')">
+                    <i class="fas fa-plus"></i> ახლის დამატება
+                </button>
+            </div>
+            <div class="sidebar-section">
+                <p class="sidebar-label">სტატისტიკა</p>
+                <div class="sidebar-stat">
+                    <span>სულ ღონისძიება</span>
+                    <strong id="sideStatEvents">—</strong>
+                </div>
+                <div class="sidebar-stat">
+                    <span>სულ რეგისტრაცია</span>
+                    <strong id="sideStatRegs">—</strong>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ─── MAIN PANEL ─── -->
+        <main class="admin-main">
+
+            <!-- ══════════════════════════════════
+                 TAB 1: EVENTS LIST
+            ══════════════════════════════════ -->
+            <div id="tabEvents">
+                <div class="panel-header">
+                    <div>
+                        <p class="section-label">MANAGEMENT</p>
+                        <h2>ღონისძიებები</h2>
+                    </div>
+                    <button class="btn-primary" onclick="showTab('add')">
+                        <i class="fas fa-plus"></i> დამატება
+                    </button>
+                </div>
+
+                <!-- Loading -->
+                <div id="adminLoading" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>იტვირთება...</p>
+                </div>
+
+                <!-- Events Table -->
+                <div class="admin-table-wrap" id="eventsTableWrap" style="display:none">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>სათაური</th>
+                                <th>კატეგორია</th>
+                                <th>თარიღი</th>
+                                <th>დრო</th>
+                                <th>ადგილი</th>
+                                <th>მონაწილეები</th>
+                                <th>მოქმედება</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Empty -->
+                <div id="adminEmpty" class="empty-state" style="display:none">
+                    <i class="fas fa-calendar-plus"></i>
+                    <h3>ჯერ ღონისძიება არ არის</h3>
+                    <p>დაამატე პირველი ღონისძიება</p>
+                    <button class="btn-outline" onclick="showTab('add')" style="margin-top:8px">დამატება</button>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════
+                 TAB 2: ADD / EDIT EVENT FORM
+            ══════════════════════════════════ -->
+            <div id="tabAdd" style="display:none">
+                <div class="panel-header">
+                    <div>
+                        <p class="section-label" id="formMode">NEW EVENT</p>
+                        <h2 id="formTitle">ახალი ღონისძიება</h2>
+                    </div>
+                    <button class="btn-outline" onclick="showTab('events')">
+                        <i class="fas fa-arrow-left"></i> უკან
+                    </button>
+                </div>
+
+                <!-- Success message -->
+                <div class="alert-success" id="formSuccess" style="display:none">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="formSuccessText">ღონისძიება დაემატა!</span>
+                </div>
+                <!-- Error message -->
+                <div class="alert-error" id="formError" style="display:none">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="formErrorText">შეცდომა</span>
+                </div>
+
+                <form class="event-form" id="eventForm" onsubmit="handleFormSubmit(event)">
+                    <!-- hidden: edit mode-ში event ID ინახება -->
+                    <input type="hidden" id="editId">
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>სათაური *</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-heading"></i>
+                                <input type="text" id="fTitle" placeholder="მაგ: Web Summit Tbilisi" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>კატეგორია *</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-tag"></i>
+                                <select id="fCategory" required>
+                                    <option value="">აირჩიე კატეგორია</option>
+                                    <option value="Tech">Tech</option>
+                                    <option value="Design">Design</option>
+                                    <option value="Business">Business</option>
+                                    <option value="Art">Art</option>
+                                    <option value="სხვა">სხვა</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>აღწერა</label>
+                        <div class="input-wrap textarea-wrap">
+                            <i class="fas fa-align-left"></i>
+                            <textarea id="fDescription" placeholder="ღონისძიების დეტალური აღწერა..." rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>თარიღი *</label>
+                            <div class="input-wrap">
+                                <i class="far fa-calendar-alt"></i>
+                                <input type="date" id="fDate" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>დრო</label>
+                            <div class="input-wrap">
+                                <i class="far fa-clock"></i>
+                                <input type="time" id="fTime">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>ადგილი</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="fLocation" placeholder="მაგ: Fabrika, თბილისი">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>ტევადობა *</label>
+                            <div class="input-wrap">
+                                <i class="fas fa-users"></i>
+                                <input type="number" id="fCapacity" placeholder="მაგ: 100" min="1" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-outline" onclick="resetForm()">
+                            <i class="fas fa-times"></i> გაუქმება
+                        </button>
+                        <button type="submit" class="btn-primary" id="formSubmitBtn">
+                            <i class="fas fa-save"></i>
+                            <span id="formSubmitText">შენახვა</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ══════════════════════════════════
+                 TAB 3: ATTENDEES
+            ══════════════════════════════════ -->
+            <div id="tabAttendees" style="display:none">
+                <div class="panel-header">
+                    <div>
+                        <p class="section-label">ATTENDEES</p>
+                        <h2 id="attendeesTitle">მონაწილეები</h2>
+                    </div>
+                    <button class="btn-outline" onclick="showTab('events')">
+                        <i class="fas fa-arrow-left"></i> უკან
+                    </button>
+                </div>
+
+                <div class="attendees-meta" id="attendeesMeta"></div>
+
+                <!-- Export button (ბონუს ფუნქცია) -->
+                <div style="margin-bottom: 16px; text-align: right;">
+                    <button class="btn-outline" onclick="exportCSV()" id="exportBtn" style="display:none">
+                        <i class="fas fa-download"></i> CSV ექსპორტი
+                    </button>
+                </div>
+
+                <div class="admin-table-wrap" id="attendeesTableWrap" style="display:none">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>სახელი</th>
+                                <th>ელ-ფოსტა</th>
+                                <th>ტელეფონი</th>
+                                <th>რეგისტრაციის დრო</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendeesTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="attendeesEmpty" class="empty-state" style="display:none">
+                    <i class="fas fa-user-slash"></i>
+                    <h3>მონაწილე ჯერ არ არის</h3>
+                    <p>ამ ღონისძიებაზე ჯერ არავინ დარეგისტრირებულა</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ─── DELETE CONFIRM MODAL ─── -->
+    <div class="modal-overlay" id="deleteModal" onclick="handleDeleteOverlay(event)">
+        <div class="modal" style="max-width:420px">
+            <div class="delete-modal-content">
+                <div class="delete-icon"><i class="fas fa-trash"></i></div>
+                <h3>დარწმუნებული ხარ?</h3>
+                <p>ეს ღონისძიება და მისი ყველა რეგისტრაცია <strong>სამუდამოდ</strong> წაიშლება.</p>
+                <div class="delete-modal-event" id="deleteModalEvent"></div>
+                <div class="delete-actions">
+                    <button class="btn-outline" onclick="closeDeleteModal()">გაუქმება</button>
+                    <button class="btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">
+                        <i class="fas fa-trash"></i> წაშლა
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+        let deleteTargetId   = null;
+        let attendeesData    = [];
+        let attendeesEventTitle = '';
+
+        // ─── PAGE LOAD ───
+        window.addEventListener('DOMContentLoaded', loadAdminEvents);
+
+        // ─── TABS ───
+        function showTab(tab) {
+            ['tabEvents','tabAdd','tabAttendees'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+
+            if (tab === 'events') {
+                document.getElementById('tabEvents').style.display = 'block';
+                document.querySelectorAll('.sidebar-btn')[0].classList.add('active');
+                loadAdminEvents();
+            } else if (tab === 'add') {
+                document.getElementById('tabAdd').style.display = 'block';
+                document.querySelectorAll('.sidebar-btn')[1].classList.add('active');
+            } else if (tab === 'attendees') {
+                document.getElementById('tabAttendees').style.display = 'block';
+            }
+        }
+
+        // ─── LOAD EVENTS (admin) ───
+        async function loadAdminEvents() {
+            document.getElementById('adminLoading').style.display      = 'flex';
+            document.getElementById('eventsTableWrap').style.display   = 'none';
+            document.getElementById('adminEmpty').style.display        = 'none';
+
+            try {
+                const res    = await fetch(`${API}/events`);
+                const events = await res.json();
+
+                // Sidebar stats
+                document.getElementById('sideStatEvents').textContent = events.length;
+
+                // total registrations — ვთვლით ყველა event-ის მიხედვით
+                let totalRegs = 0;
+                events.forEach(e => { totalRegs += (e.registeredCount || 0); });
+                document.getElementById('sideStatRegs').textContent = totalRegs;
+
+                renderAdminTable(events);
+
+            } catch (err) {
+                document.getElementById('adminLoading').innerHTML =
+                    `<p style="color:var(--error)">სერვერთან კავშირი ვერ მოხერხდა</p>`;
+            }
+        }
+
+        // ─── RENDER TABLE ───
+        function renderAdminTable(events) {
+            document.getElementById('adminLoading').style.display = 'none';
+
+            if (events.length === 0) {
+                document.getElementById('adminEmpty').style.display = 'flex';
+                return;
+            }
+
+            const tbody = document.getElementById('eventsTableBody');
+            tbody.innerHTML = '';
+
+            events.forEach(event => {
+                const isFull  = (event.registeredCount || 0) >= event.capacity;
+                const pct     = Math.min(Math.round(((event.registeredCount || 0) / event.capacity) * 100), 100);
+                const tr      = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="table-title">${event.title}</div>
+                        <div class="table-sub">ID: ${event.id}</div>
+                    </td>
+                    <td>
+                        <span class="table-badge ${getBadgeClass(event.category)}">
+                            ${event.category || 'სხვა'}
+                        </span>
+                    </td>
+                    <td>${formatDate(event.date)}</td>
+                    <td>${event.time || '—'}</td>
+                    <td>${event.location || '—'}</td>
+                    <td>
+                        <div class="table-capacity">
+                            <span class="${isFull ? 'text-error' : ''}">${event.registeredCount || 0} / ${event.capacity}</span>
+                            <div class="mini-bar">
+                                <div class="mini-fill" style="width:${pct}%; background:${isFull ? 'var(--error)' : pct >= 80 ? '#f59e0b' : 'var(--primary)'}"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="action-btn view-btn" onclick="viewAttendees(${event.id}, '${escapeStr(event.title)}')" title="მონაწილეები">
+                                <i class="fas fa-users"></i>
+                            </button>
+                            <button class="action-btn edit-btn" onclick="editEvent(${event.id})" title="რედაქტირება">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="openDeleteModal(${event.id}, '${escapeStr(event.title)}')" title="წაშლა">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('eventsTableWrap').style.display = 'block';
+        }
+
+        // ─── VIEW ATTENDEES ───
+        async function viewAttendees(eventId, eventTitle) {
+            attendeesEventTitle = eventTitle;
+            showTab('attendees');
+
+            document.getElementById('attendeesTitle').textContent       = eventTitle + ' — მონაწილეები';
+            document.getElementById('attendeesTableWrap').style.display = 'none';
+            document.getElementById('attendeesEmpty').style.display     = 'none';
+            document.getElementById('exportBtn').style.display          = 'none';
+            document.getElementById('attendeesMeta').innerHTML          =
+                '<div class="loading-state" style="padding:40px 0"><div class="spinner"></div></div>';
+
+            try {
+                const res  = await fetch(`${API}/events/${eventId}/attendees`);
+                const data = await res.json();
+
+                attendeesData = data.attendees;
+
+                document.getElementById('attendeesMeta').innerHTML = `
+                    <div class="attendees-stats">
+                        <div class="att-stat">
+                            <strong>${data.total}</strong>
+                            <span>დარეგისტრირებული</span>
+                        </div>
+                        <div class="att-stat">
+                            <strong>${data.spotsLeft}</strong>
+                            <span>თავისუფალი ადგილი</span>
+                        </div>
+                        <div class="att-stat">
+                            <strong>${data.event.capacity}</strong>
+                            <span>სულ ადგილი</span>
+                        </div>
+                    </div>
+                `;
+
+                if (data.attendees.length === 0) {
+                    document.getElementById('attendeesEmpty').style.display = 'flex';
+                    return;
+                }
+
+                const tbody = document.getElementById('attendeesTableBody');
+                tbody.innerHTML = '';
+
+                data.attendees.forEach((att, i) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="color:var(--text-muted)">${i + 1}</td>
+                        <td><strong>${att.fullName}</strong></td>
+                        <td>${att.email}</td>
+                        <td>${att.phone || '—'}</td>
+                        <td style="color:var(--text-muted); font-size:0.82rem">${formatDateTime(att.createdAt)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('attendeesTableWrap').style.display = 'block';
+                document.getElementById('exportBtn').style.display          = 'inline-flex';
+
+            } catch (err) {
+                document.getElementById('attendeesMeta').innerHTML =
+                    `<p style="color:var(--error)">მონაცემების ჩატვირთვა ვერ მოხერხდა</p>`;
+            }
+        }
+
+        // ─── EXPORT CSV (ბონუს ფუნქცია) ───
+        function csvEscape(v) {
+            const s = String(v ?? '');
+            if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+            return s;
+        }
+
+        function exportCSV() {
+            if (!attendeesData.length) return;
+
+            const header = ['#', 'სახელი', 'ელ-ფოსტა', 'ტელეფონი', 'რეგისტრაცია'];
+            const rows   = attendeesData.map((a, i) => [
+                i + 1, a.fullName, a.email, a.phone || '', formatDateTime(a.createdAt)
+            ]);
+
+            const csv  = [header, ...rows].map(r => r.map(csvEscape).join(',')).join('\n');
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = `${attendeesEventTitle}-მონაწილეები.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ─── ADD EVENT ───
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            document.getElementById('formSuccess').style.display = 'none';
+            document.getElementById('formError').style.display   = 'none';
+
+            const btn = document.getElementById('formSubmitBtn');
+            btn.disabled = true;
+            document.getElementById('formSubmitText').textContent = 'ინახება...';
+
+            const body = {
+                title       : document.getElementById('fTitle').value.trim(),
+                description : document.getElementById('fDescription').value.trim(),
+                date        : document.getElementById('fDate').value,
+                time        : document.getElementById('fTime').value,
+                location    : document.getElementById('fLocation').value.trim(),
+                category    : document.getElementById('fCategory').value,
+                capacity    : parseInt(document.getElementById('fCapacity').value),
+            };
+
+            const editId  = document.getElementById('editId').value;
+            const isEdit  = !!editId;
+            const url     = isEdit ? `${API}/events/${editId}` : `${API}/events`;
+            const method  = isEdit ? 'PUT' : 'POST';
+
+            try {
+                const res  = await fetch(url, {
+                    method,
+                    headers : { 'Content-Type': 'application/json' },
+                    body    : JSON.stringify(body)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    document.getElementById('formSuccessText').textContent =
+                        isEdit ? 'ღონისძიება განახლდა!' : 'ღონისძიება დაემატა!';
+                    document.getElementById('formSuccess').style.display = 'flex';
+                    if (!isEdit) resetForm();
+                } else {
+                    document.getElementById('formErrorText').textContent = data.error || 'შეცდომა';
+                    document.getElementById('formError').style.display   = 'flex';
+                }
+            } catch (err) {
+                document.getElementById('formErrorText').textContent = 'სერვერთან კავშირი ვერ მოხერხდა';
+                document.getElementById('formError').style.display   = 'flex';
+            } finally {
+                btn.disabled = false;
+                document.getElementById('formSubmitText').textContent = 'შენახვა';
+            }
+        }
+
+        // ─── EDIT EVENT ───
+        async function editEvent(id) {
+            showTab('add');
+            document.getElementById('formMode').textContent  = 'EDIT EVENT';
+            document.getElementById('formTitle').textContent = 'ღონისძიების რედაქტირება';
+            document.getElementById('formSuccess').style.display = 'none';
+            document.getElementById('formError').style.display   = 'none';
+
+            try {
+                const res   = await fetch(`${API}/events/${id}`);
+                const event = await res.json();
+
+                document.getElementById('editId').value       = event.id;
+                document.getElementById('fTitle').value       = event.title;
+                document.getElementById('fDescription').value = event.description || '';
+                document.getElementById('fDate').value        = event.date || '';
+                document.getElementById('fTime').value        = event.time || '';
+                document.getElementById('fLocation').value    = event.location || '';
+                document.getElementById('fCategory').value    = event.category || '';
+                document.getElementById('fCapacity').value    = event.capacity;
+
+            } catch (err) {
+                alert('ღონისძიების ჩატვირთვა ვერ მოხერხდა');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('eventForm').reset();
+            document.getElementById('editId').value           = '';
+            document.getElementById('formMode').textContent   = 'NEW EVENT';
+            document.getElementById('formTitle').textContent  = 'ახალი ღონისძიება';
+            document.getElementById('formSuccess').style.display = 'none';
+            document.getElementById('formError').style.display   = 'none';
+        }
+
+        // ─── DELETE ───
+        function openDeleteModal(id, title) {
+            deleteTargetId = id;
+            document.getElementById('deleteModalEvent').textContent = title;
+            document.getElementById('deleteModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            document.body.style.overflow = '';
+            deleteTargetId = null;
+        }
+        function handleDeleteOverlay(e) {
+            if (e.target === e.currentTarget) closeDeleteModal();
+        }
+
+        async function confirmDelete() {
+            const btn     = document.getElementById('confirmDeleteBtn');
+            btn.disabled  = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> წაიშლება...';
+
+            try {
+                const delRes = await fetch(`${API}/events/${deleteTargetId}`, { method: 'DELETE' });
+                if (!delRes.ok) {
+                    const d = await delRes.json().catch(() => ({}));
+                    alert(d.error || 'წაშლა ვერ მოხერხდა');
+                    return;
+                }
+                closeDeleteModal();
+                loadAdminEvents();
+            } catch (err) {
+                alert('წაშლა ვერ მოხერხდა');
+            } finally {
+                btn.disabled  = false;
+                btn.innerHTML = '<i class="fas fa-trash"></i> წაშლა';
+            }
+        }
+
+        // ─── HELPERS ───
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            const months = ['იან','თებ','მარ','აპრ','მაი','ივნ','ივლ','აგვ','სექ','ოქტ','ნოე','დეკ'];
+            const d = new Date(dateStr);
+            return `${d.getDate()} ${months[d.getMonth()]}, ${d.getFullYear()}`;
+        }
+        function formatDateTime(str) {
+            if (!str) return '—';
+            return str.replace('T', ' ').slice(0, 16);
+        }
+        function getBadgeClass(category) {
+            return { Tech: '', Design: 'badge-amber', Business: 'badge-green', Art: 'badge-red' }[category] || '';
+        }
+        function escapeStr(str) {
+            return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+</html>

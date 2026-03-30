@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventPro | ღონისძიება</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="event.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <!-- ─── NAVBAR ─── -->
+    <header class="navbar">
+        <div class="container flex-between">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span>EventPro</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">მთავარი</a>
+                <a href="admin.html" class="admin-btn">
+                    <span>Admin Panel</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ─── BACK BUTTON ─── -->
+    <div class="container" style="padding-top: 32px;">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>უკან დაბრუნება</span>
+        </a>
+    </div>
+
+    <!-- ─── LOADING ─── -->
+    <div class="container" id="loadingWrap" style="padding-top:80px; text-align:center;">
+        <div class="spinner" style="margin: 0 auto 16px;"></div>
+        <p style="color: var(--text-muted);">იტვირთება...</p>
+    </div>
+
+    <!-- ─── EVENT DETAIL ─── (JS-ით შეივსება) -->
+    <div id="eventDetail" style="display:none">
+
+        <!-- HERO IMAGE -->
+        <div class="event-hero">
+            <img id="heroImg" src="" alt="">
+            <div class="event-hero-overlay"></div>
+            <div class="container event-hero-content">
+                <div id="heroBadge" class="badge" style="margin-bottom:16px"></div>
+                <h1 id="heroTitle"></h1>
+                <div class="event-hero-meta">
+                    <span><i class="far fa-calendar-alt"></i> <span id="heroDate"></span></span>
+                    <span><i class="far fa-clock"></i> <span id="heroTime"></span></span>
+                    <span><i class="fas fa-map-marker-alt"></i> <span id="heroLocation"></span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="container event-main">
+            <div class="event-layout">
+
+                <!-- LEFT: Description -->
+                <div class="event-left">
+                    <div class="event-section">
+                        <h2>ღონისძიების შესახებ</h2>
+                        <p id="eventDescription"></p>
+                    </div>
+
+                    <div class="event-section">
+                        <h2>დეტალები</h2>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <div>
+                                    <span class="detail-label">თარიღი</span>
+                                    <span class="detail-value" id="detailDate"></span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="far fa-clock"></i>
+                                <div>
+                                    <span class="detail-label">დრო</span>
+                                    <span class="detail-value" id="detailTime"></span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <span class="detail-label">ადგილი</span>
+                                    <span class="detail-value" id="detailLocation"></span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-tag"></i>
+                                <div>
+                                    <span class="detail-label">კატეგორია</span>
+                                    <span class="detail-value" id="detailCategory"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Registration Card -->
+                <div class="event-right">
+                    <div class="reg-card" id="regCard">
+
+                        <!-- Capacity Bar -->
+                        <div class="capacity-section">
+                            <div class="capacity-header">
+                                <span>მონაწილეები</span>
+                                <span id="capacityNumbers"></span>
+                            </div>
+                            <div class="capacity-bar">
+                                <div class="capacity-fill" id="capacityFill"></div>
+                            </div>
+                            <p class="capacity-note" id="capacityNote"></p>
+                        </div>
+
+                        <!-- FORM -->
+                        <div id="formWrap">
+                            <h3>დარეგისტრირდი</h3>
+
+                            <!-- Success -->
+                            <div id="successBox" style="display:none">
+                                <div class="success-icon" style="margin: 0 auto 16px;"><i class="fas fa-check"></i></div>
+                                <h4 style="text-align:center; margin-bottom:8px;">წარმატებით დარეგისტრირდით!</h4>
+                                <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">თქვენი კოდი:</p>
+                                <div class="confirmation-code" id="confirmCode"></div>
+                            </div>
+
+                            <!-- Form -->
+                            <form id="regForm" onsubmit="handleRegister(event)">
+                                <div class="input-group">
+                                    <label>სახელი და გვარი</label>
+                                    <div class="input-wrap">
+                                        <i class="fas fa-user"></i>
+                                        <input type="text" id="inputName" placeholder="გიორგი გიორგაძე" required>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>ელ-ფოსტა</label>
+                                    <div class="input-wrap" id="emailWrap">
+                                        <i class="fas fa-envelope"></i>
+                                        <input type="email" id="inputEmail" placeholder="giorgi@email.com" required>
+                                    </div>
+                                    <span class="error-msg" id="errorDuplicate" style="display:none">
+                                        <i class="fas fa-exclamation-circle"></i> ეს ელ-ფოსტა უკვე გამოყენებულია
+                                    </span>
+                                </div>
+                                <div class="input-group">
+                                    <label>ტელეფონი</label>
+                                    <div class="input-wrap">
+                                        <i class="fas fa-phone"></i>
+                                        <input type="tel" id="inputPhone" placeholder="+995 555 00 00 00" required>
+                                    </div>
+                                </div>
+
+                                <div class="error-banner" id="errorCapacity" style="display:none">
+                                    <i class="fas fa-ban"></i> ადგილები სავსეა
+                                </div>
+                                <div class="error-banner" id="errorGeneral" style="display:none">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span id="errorGeneralText"></span>
+                                </div>
+
+                                <button type="submit" class="btn-primary w-full" id="submitBtn">
+                                    <span>დარეგისტრირება</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Full State -->
+                        <div id="fullState" style="display:none">
+                            <div class="full-banner">
+                                <i class="fas fa-lock"></i>
+                                <div>
+                                    <strong>ადგილები სავსეა</strong>
+                                    <p>ეს ღონისძიება სავსეა, რეგისტრაცია შეუძლებელია</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ─── NOT FOUND ─── -->
+    <div id="notFound" style="display:none" class="container" style="padding: 80px 0; text-align:center;">
+        <div class="error-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>ღონისძიება ვერ მოიძებნა</h3>
+            <p>შესაძლოა წაშლილი იყოს ან ID არასწორია</p>
+            <a href="index.html" class="btn-outline" style="margin-top:16px; display:inline-flex;">
+                მთავარ გვერდზე დაბრუნება
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        // URL-დან event ID-ის წამოღება: event.html?id=3
+        const params  = new URLSearchParams(window.location.search);
+        const eventId = params.get('id');
+
+        // ─── PAGE LOAD ───
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!eventId) {
+                showNotFound();
+                return;
+            }
+            loadEvent();
+        });
+
+        // ─── LOAD EVENT ───
+        async function loadEvent() {
+            try {
+                const res   = await fetch(`${API}/events/${eventId}`);
+                if (!res.ok) { showNotFound(); return; }
+
+                const event = await res.json();
+                renderEvent(event);
+
+            } catch (err) {
+                showNotFound();
+            }
+        }
+
+        // ─── RENDER ───
+        function renderEvent(event) {
+            document.getElementById('loadingWrap').style.display = 'none';
+            document.getElementById('eventDetail').style.display = 'block';
+            document.title = `EventPro | ${event.title}`;
+
+            const isFull  = event.spotsLeft <= 0;
+            const pct     = Math.min((event.registeredCount / event.capacity) * 100, 100);
+
+            // Hero
+            document.getElementById('heroImg').src          = getCategoryImage(event.category);
+            document.getElementById('heroTitle').textContent = event.title;
+            document.getElementById('heroDate').textContent  = formatDate(event.date);
+            document.getElementById('heroTime').textContent  = event.time || '—';
+            document.getElementById('heroLocation').textContent = event.location || '—';
+            document.getElementById('heroBadge').textContent    = event.category || 'სხვა';
+            document.getElementById('heroBadge').className      = `badge ${getBadgeClass(event.category, isFull)}`;
+
+            // Details
+            document.getElementById('eventDescription').textContent = event.description || 'აღწერა არ არის';
+            document.getElementById('detailDate').textContent       = formatDate(event.date);
+            document.getElementById('detailTime').textContent       = event.time || '—';
+            document.getElementById('detailLocation').textContent   = event.location || '—';
+            document.getElementById('detailCategory').textContent   = event.category || '—';
+
+            // Capacity
+            document.getElementById('capacityNumbers').textContent = `${event.registeredCount} / ${event.capacity}`;
+            document.getElementById('capacityFill').style.width    = `${pct}%`;
+            document.getElementById('capacityFill').style.background =
+                pct >= 100 ? 'var(--error)' : pct >= 80 ? '#f59e0b' : 'var(--primary)';
+            document.getElementById('capacityNote').textContent =
+                isFull ? 'ადგილები სავსეა' :
+                event.spotsLeft <= 5 ? `⚠️ მხოლოდ ${event.spotsLeft} ადგილი დარჩა!` :
+                `${event.spotsLeft} ადგილი ხელმისაწვდომია`;
+
+            // Show/hide form or full state
+            if (isFull) {
+                document.getElementById('formWrap').style.display  = 'none';
+                document.getElementById('fullState').style.display = 'block';
+            }
+        }
+
+        // ─── REGISTER ───
+        async function handleRegister(e) {
+            e.preventDefault();
+
+            document.getElementById('errorDuplicate').style.display = 'none';
+            document.getElementById('errorCapacity').style.display  = 'none';
+            document.getElementById('errorGeneral').style.display   = 'none';
+            document.getElementById('emailWrap').classList.remove('has-error');
+
+            const btn     = document.getElementById('submitBtn');
+            btn.disabled  = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> გაგზავნა...';
+
+            try {
+                const res  = await fetch(`${API}/events/${eventId}/register`, {
+                    method  : 'POST',
+                    headers : { 'Content-Type': 'application/json' },
+                    body    : JSON.stringify({
+                        fullName : document.getElementById('inputName').value.trim(),
+                        email    : document.getElementById('inputEmail').value.trim(),
+                        phone    : document.getElementById('inputPhone').value.trim(),
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    document.getElementById('regForm').style.display   = 'none';
+                    document.getElementById('successBox').style.display = 'block';
+                    document.getElementById('confirmCode').textContent  = data.confirmationCode;
+                    loadEvent(); // capacity bar განახლება
+
+                } else {
+                    if (data.error === 'duplicate_email') {
+                        document.getElementById('errorDuplicate').style.display = 'flex';
+                        document.getElementById('emailWrap').classList.add('has-error');
+                    } else if (data.error === 'capacity_full') {
+                        document.getElementById('errorCapacity').style.display = 'flex';
+                    } else {
+                        document.getElementById('errorGeneralText').textContent = data.message || 'შეცდომა';
+                        document.getElementById('errorGeneral').style.display   = 'flex';
+                    }
+                }
+            } catch (err) {
+                document.getElementById('errorGeneralText').textContent = 'სერვერთან კავშირი ვერ მოხერხდა';
+                document.getElementById('errorGeneral').style.display   = 'flex';
+            } finally {
+                btn.disabled  = false;
+                btn.innerHTML = '<span>დარეგისტრირება</span><i class="fas fa-arrow-right"></i>';
+            }
+        }
+
+        function showNotFound() {
+            document.getElementById('loadingWrap').style.display = 'none';
+            document.getElementById('notFound').style.display    = 'block';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            const months = ['იანვარი','თებერვალი','მარტი','აპრილი','მაისი','ივნისი',
+                            'ივლისი','აგვისტო','სექტემბერი','ოქტომბერი','ნოემბერი','დეკემბერი'];
+            const d = new Date(dateStr);
+            return `${d.getDate()} ${months[d.getMonth()]}, ${d.getFullYear()}`;
+        }
+
+        function getBadgeClass(category, isFull) {
+            if (isFull) return 'badge-red';
+            return { Tech: '', Design: 'badge-amber', Business: 'badge-green', Art: 'badge-red' }[category] || '';
+        }
+
+        function getCategoryImage(category) {
+            const imgs = {
+                Tech     : 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1200',
+                Design   : 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1200',
+                Business : 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200',
+                Art      : 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1200',
+            };
+            return imgs[category] || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200';
+        }
+    </script>
+</body>
+</html>
