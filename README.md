@@ -60,7 +60,13 @@ npm start
 
 ## დემო სკრინშოტები (ჩასაბარებლად)
 
- ფოლდერი `docs/screenshots/` 
+## Demo
+
+![Demo1](./docs/screenshots/demo1.png)
+![Demo2](./docs/screenshots/demo2.png)
+![Demo3](./docs/screenshots/demo3.png)
+![Demo4](./docs/screenshots/demo4.png)
+![Demo5](./docs/screenshots/demo5.png)
 
 
 ## პროექტის სტრუქტურა
