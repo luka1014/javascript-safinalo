@@ -78,6 +78,7 @@ backend/
   routes/events.js
   routes/registrations.js
   package.json
+docs/screenshots/
 frontend/
   index.html
   event.html
